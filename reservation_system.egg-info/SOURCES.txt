@@ -1,3 +1,4 @@
+LICENSE
 MANIFEST.in
 README.md
 license.txt
@@ -17,6 +18,7 @@ reservation_system/config/__init__.py
 reservation_system/config/desktop.py
 reservation_system/config/docs.py
 reservation_system/reservation_system/__init__.py
+reservation_system/reservation_system/custom/stock_entry_detail.json
 reservation_system/reservation_system/doctype/__init__.py
 reservation_system/reservation_system/doctype/reservation_schedule/__init__.py
 reservation_system/reservation_system/doctype/reservation_schedule/reservation_schedule.js

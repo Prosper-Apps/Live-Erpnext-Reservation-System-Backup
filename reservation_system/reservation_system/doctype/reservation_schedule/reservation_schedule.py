@@ -166,6 +166,9 @@ def reserve_item(item, parent_warehouse):
 	already_allocated = already_allocated_qty(item.item_code,parent_warehouse)
 	print('already_allocated: ',already_allocated)
 
+	if actual_qty_in_wh == None:
+		actual_qty_in_wh = 0
+
 	new_wh_qty = actual_qty_in_wh - already_allocated
 	print('new_wh_qty : ',new_wh_qty)
 
