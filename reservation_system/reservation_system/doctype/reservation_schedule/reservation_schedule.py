@@ -41,7 +41,7 @@ class ReservationSchedule(Document):
 	def check_reserve_till(self):
 		if self.reserve_till and (getdate(self.reserve_till) < getdate(nowdate())):
 			frappe.throw("Reserve date cannot be past date")
-		
+
 	# Restricting duplicate item reservation against same so_number
 	def restrict_duplicate_item_reservaton(self):
 		print('------------------------------ restrict_duplicate_item_reservaton ---------------------------------------------------')
@@ -238,15 +238,9 @@ def update_delivered_qty(doc,event):
 									""",as_dict=1)[0]
 		print('delivery_note_items: ',delivery_note_items)
 
-		# (select status from `Delivery Note` as dn WHERE dn.name = parent) != 'Cancelled'
-		# print('delivery_note_items:',delivery_note_items)
-
-		# print('doc.actual_qty: ',doc.actual_qty)
-
 		against_sales_order = delivery_note_items.against_sales_order
 
 		def delivery_note_without_reservation_schedule(item_code,warehouse):
-			# print('delivery_note_without_reservation_schedule-->',item_code,warehouse)
 			reservation_schedule_items = frappe.db.sql(f"""
 															SELECT rs.name, rsi.item_code, rsi.qty, SUM(rsi.reserve_qty) AS reserve_qty FROM `tabReservation Schedule Item` rsi 
 															JOIN
@@ -260,9 +254,6 @@ def update_delivered_qty(doc,event):
 															AND
 															(select status from `tabReservation Schedule` As rs WHERE rs.name = rsi.parent) = 'Open'
 														""",as_dict=1)[0]
-			# print('reservation_schedule_items: ',reservation_schedule_items)
-
-			# need to see what present insid reservation_schedule_items
 			
 			if reservation_schedule_items.item_code != None:
 				rs_qty = reservation_schedule_items.qty
@@ -270,7 +261,7 @@ def update_delivered_qty(doc,event):
 
 				item_qty_in_wh = frappe.db.sql(f"""
 													SELECT item_code, SUM(actual_qty) as actual_qty
-													FROM `tabBin` 
+													FROM `tabBin`
 													WHERE `tabBin`.warehouse
 													IN (
 														SELECT name FROM `tabWarehouse` WHERE 
@@ -278,15 +269,10 @@ def update_delivered_qty(doc,event):
 														)
 													AND `tabBin`.item_code = '{item_code}'
 												""",as_dict=1)[0]
-				# print('item_qty_in_wh: ',item_qty_in_wh)
 		
 				item_qty_in_wh = item_qty_in_wh.actual_qty
 
-				# if item_qty_in_wh == None:
-				# 	item_qty_in_wh = 0
-
 				open_qty = item_qty_in_wh - rs_reserve_qty
-				# print('Open Qty : ',open_qty)
 
 				if open_qty <= 0:
 					msg = f'{delivery_note_items.qty} Unit of Item Code : {item_code} needed in Warehouse - (Some Qty Reserve in Reservation Schedule)'
@@ -304,11 +290,8 @@ def update_delivered_qty(doc,event):
 															AND
 															(select status from `tabReservation Schedule` as rs WHERE rs.name = `tabReservation Schedule Item`.parent) = 'Open'
 														""",as_dict=1)
-			# print('reservation_schedule_item: ',reservation_schedule_items)
-
 			if len(reservation_schedule_items) != 0:
 				reservation_schedule_items = reservation_schedule_items[0]
-				# print('reservation_schedule_items: ',reservation_schedule_items)
 
 				frappe.db.set_value('Reservation Schedule Item', reservation_schedule_items.name, 'delivered_qty', reservation_schedule_items.delivered_qty - doc.actual_qty)
 
