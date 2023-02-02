@@ -650,7 +650,7 @@ def make_delivery_note(source_name, target_doc=None, skip_item_mapping=False):
 def make_pick_list(source_name, target_doc=None, skip_item_mapping=False):
 	print('source_name: ',source_name)
 
-	# from erpnext.stock.doctype.packed_item.packed_item import is_product_bundle
+	from erpnext.stock.doctype.packed_item.packed_item import is_product_bundle
 	source1 = frappe.db.sql(f"""
 								SELECT so_detail,
 								(
